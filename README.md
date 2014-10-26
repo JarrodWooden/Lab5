@@ -147,4 +147,95 @@ After that bouncing the ball across the screen worked!!
 
 #A Functionality
 
+Objective: Create Pong on your display! Create a single paddle that will move up and down on one side of the display, controlled by the up and down buttons. The block will bounce off the paddle like it bounces off the wall. When the block misses hitting the paddle, the game will end.
+
+The first thing I needed to decide was how I was going to make the paddle for pong. I thought it was easiest and it made the most sense to just make a paddle with two more square that can only move up and down on the far left side of the screen.
+
+All I needed to do was to create a new object for the paddle in the header and source files so that I could check whether or not the ball ran into the paddle. Below is how I made the object for the paddle:
+
+```
+	paddle createPaddle(int xPos, int yPos) {
+		paddle paddleToCreate;
+
+		paddleToCreate.position.x = xPos;
+		paddleToCreate.position.y = yPos;
+
+		return paddleToCreate;
+	}
+```
+
+Then I had to make a new collision method to check if the ball ran into the paddle, which the code for is below:
+
+```
+	static signed int collisionObjects(ball_t theBall, paddle thePaddle) {
+		//need to check whether or not the bouncing ball has collided with the
+		//paddle
+
+		//remember the way I'm doing it is that there are two boxes together to make the paddle.
+
+		if (theBall.position.x <= (thePaddle.position.x+1)) {
+			if (theBall.position.y >= thePaddle.position.y && theBall.position.y <= (thePaddle.position.y+1)) {
+				return 1;
+			}
+		}
+
+			return 0;
+
+	}
+```
+
+In the main.c I first initialized "two paddles" but it is really one it was to make it easier to draw the paddle using the drawBlock() method in the assembly nokia.asm file.
+
+Initialization:
+```
+    static paddle thePaddle1;
+    static paddle thePaddle2;
+
+    thePaddle1.position.x = 0;
+    thePaddle1.position.y = 0;
+
+    //just for drawing purposes
+    thePaddle2.position.x = 0;
+    thePaddle2.position.y = 1;
+```
+
+This is how I drew the "ball" and the "paddle" each time through the infinite loop:
+
+```
+			clearDisplay();
+
+			drawBlock(theBall.position.y, theBall.position.x, color);
+			drawBlock(thePaddle1.position.y, thePaddle1.position.x, color);
+			drawBlock(thePaddle2.position.y, thePaddle2.position.x, color);
+```
+
+Then when I needed to delay for the movement of the ball and needing to poll for button presses (to move the paddle up and down the screen) then I needed to make sure that the paddle didn't move off the screen when I clicked up or down:
+
+```
+			if (UP_BUTTON == 0) {
+				while (UP_BUTTON == 0)		//debouncing (kind of)
+					;
+				if (thePaddle1.position.y >= 1)
+					thePaddle1.position.y = thePaddle1.position.y - 1;
+					thePaddle2.position.y = thePaddle1.position.y - 1;
+				button_press = TRUE;
+			} else if (DOWN_BUTTON == 0) {
+				while (DOWN_BUTTON == 0)	//debouncing
+					;
+				if (thePaddle2.position.y <= 6)
+					thePaddle1.position.y = thePaddle1.position.y + 1;
+					thePaddle2.position.y = thePaddle1.position.y + 1;
+				button_press = TRUE;
+```
+
+#Bonus Functionality: Inverting the Screen
+
+I added on to A Functionality that whenver the aux button is pressed it sends clear display the parameter "color" that we used in the required functionality and would swap the drawing the paddle and ball from black to white or vice versa, and the display from white to black or vice versa. The cleardisplay() method in assembly needed to be modified to accept the parameter color and to be able to draw an all black screen if it needed to.
+
+
+
+Documentation: Austin Bolinger talked about some concepts that were needed to accomplish required functionality so that I could get a head start and know what direction to take required functionality. It just saved me on time.
+
+#Have a Great Air Force Day and Thanks for Reading!
+
 
