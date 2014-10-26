@@ -82,4 +82,69 @@ Which was just taken away from the C code. In other words the cleardisplay() was
 
 #B Functionality
 
+Create a bouncing block! This block should move across the screen with no more than 8 pixels per jump. It should bounce off the walls appropriately, similar to assignment 6. An adequate delay movement should be added between each block movement. Your starting position and starting x and y velocities should be initialized in your header, or should be randomly generated.
+
+First needed to define the screen dimensions:
+
+```
+#define		TRUE			1
+#define		FALSE			0
+#define		WIDTH			11
+#define		HEIGHT			8
+```
+
+I used the pong header and source file from an assignment we had in class that I made. It was to design a header a source file to be able to make a ball object and be able to bounce it around on a defined screen.
+
+```
+	ball_t createBall(int xPos, int yPos, int xVel, int yVel) {
+		ball_t ballToCreate;
+
+		ballToCreate.position.x = xPos;
+		ballToCreate.position.y = yPos;
+
+		ballToCreate.velocity.x = xVel;
+		ballToCreate.velocity.y = yVel;
+
+		return ballToCreate;
+	}
+
+	ball_t moveBall(ball_t ballToMove) {
+
+		//check if ball is running into any of the side walls
+		if (collisionX(ballToMove.position.x)) {
+			ballToMove.velocity.x = -1*ballToMove.velocity.x;
+		}
+
+
+		ballToMove.position.x += ballToMove.velocity.x;
+
+
+		//check if the ball is running into the top or bottom and move the ball
+		if (collisionY(ballToMove.position.y)) {
+			ballToMove.velocity.y = -1*ballToMove.velocity.y;
+		}
+
+		ballToMove.position.y += ballToMove.velocity.y;
+
+
+		return ballToMove;
+	}
+```
+
+The above code creates a ball object and then a method that I can call that will move the ball. In move ball, it checks whether it collided with any of the walls and it will reverse the direction of the velocity before it increments the ball in the opposite direction.
+
+In the main.c for B functionality, I create the ball (which is a square) and in an infinite loop call moveBall() and then it keeps redrawing the square passing drawblock the coordinates of the "ball" object, and I keep on clearing the diplay before redrawing the block.
+
+Also there needed to be some kind of delay or else the ball would fly across the screen too fast. I simply just made nested for loops to get an exact time delay that looked good on the screen when I ran the program.
+
+```
+		for (x = 500; x>0; x--) { //delay a second
+			for (y = 1279; y>0; y--);
+		}
+```
+
+After that bouncing the ball across the screen worked!!
+
+#A Functionality
+
 
