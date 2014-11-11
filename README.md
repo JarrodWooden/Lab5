@@ -3,6 +3,8 @@ Lab5
 
 Functionality Objectives: Read and Decode button presses from an IR Remote, Make the LED's on the MSP430 turn ON and OFF with button presses from the remote control, and implement a game on the LED screen that you can use button presses from the MSP430 to control.
 
+Documentation: Use of Dr Coulston's code to help me get started with the lab.
+
 Met Functionalities: Day Two Activities - Checked by Dr York
                     Required Functionality - Checked by Dr York
                     A - Functionality - Checked by Dr York
