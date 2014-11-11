@@ -76,11 +76,101 @@ The code to accomplish this is EASY and is below:
 	P2IFG &= ~BIT6;			// Clear the interrupt flag to prevent immediate ISR re-entry
 ```
 
+One thing important about `packetIndex > 40` my message length is 16; however, I just decided I want to look at a bigger set of data to find what message is being sent by just finding the start Value.
+
+It bounces out of the ISR if the pulse length is high for too long.
+
 Now I need to change the main method that will actually read the packet and decide what to do with it.
 
+initMSP430():
 
+This method just simply says how we need to talk to the MSP430 to be able to better read the IR Sensor, such as what the timer needs to be... the watchdog timer etc. Here is the explanation of the method in my code that was written by Dr Coulston:
 
+```
+// The timer must be enabled so that we can tell how long the pulses
+// last.  In some degenerate cases, we will need to generate a interrupt
+// when the timer rolls over.  This will indicate the end of a packet
+// and will be used to alert main that we have a new packet.
+```
 
+Also just setting up what pins we will be talking to.
+
+At the end of the method it enables interrupts with `_enable_interrupt();`
+
+My Main Method:
+
+At the top of my main.c before the main method I initialized these values:
+
+```
+int8	newIrPacket = FALSE;
+int16	packetData[40];
+int16	bitString;
+int8	packetIndex = 0;
+int8	packetIndex2 = 0;
+```
+
+First thing to do in the main is initMSP430();
+
+Then we go into an infinite while loop that will just wait till it is interrupted by the IR Sensor when it reads data from the IR Sensor in the ISR.
+
+Infinite while loop:
+
+First set my packetIndex (not the one that is used int he ISR) to zero.
+
+Then check if we have a new packet.
+
+If we do have a new packet disable interrupt (we don't want to get interrupted again while we are trying to read the packet of data.
+
+Look for the Start Value!!:
+```
+			while ((packetData[packetIndex2] != 2) && (packetIndex2 < 40)) {
+				packetIndex2++;
+			}
+```
+
+Once we have found the start value let's read in the message!: (of length 16)
+```
+			int length = 0;
+
+			while (length < 16) {
+				bitString+=packetData[packetIndex2++];
+				bitString<<=1;
+				length++;
+			}
+```
+
+Then check what button press the message was and LED's to turn on on the MSP430():
+```
+				if (bitString == CH_UP) {
+					P1OUT |= BIT0;
+						}
+				if (bitString == CH_DW) {
+					P1OUT &= ~BIT0;
+						}
+				if (bitString == ONE) {
+					P1OUT ^= BIT0;
+						}
+				if (bitString == VOL_UP) {
+					P1OUT |= BIT6;
+						}
+				if (bitString == VOL_DW) {
+					P1OUT &= ~BIT6;
+						}
+				if (bitString == TWO) {
+					P1OUT ^= BIT6;
+				}
+```
+
+Then at the end of what we are doing if there is a new packet. Set the bitString that is the register that contains the message back to zero, set the packetIndex back to zero, and put the packet flag back to false.
+
+Finally do a a little delay so that there aren't multiple button presses really fast.
+
+```
+			int i;
+			for (i = 0; i<0xFFFF; i++);
+```
+
+Then continue in the infinite while loop waiting for more button presses read in from the IR Sensor.
 
 #Have a Great Air Force Day and Thanks for Reading!
 
