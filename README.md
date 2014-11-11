@@ -172,6 +172,104 @@ Finally do a a little delay so that there aren't multiple button presses really 
 
 Then continue in the infinite while loop waiting for more button presses read in from the IR Sensor.
 
+#A Functionality
+
+Objective: Take the decoded button presses and instead of turning the LED's on or off, talk to the LCD screen to implement the Etch-a-Sketch Lab that was in Lab4 Repository.
+
+I used the nokia.asm to talk to the LCD Screen, so I included that file in my project.
+
+I kept the same header file from the Required Functionality
+
+I needed to define the values for the LCD Screen that I need for the Etch-a-Sketch routine:
+```
+//define stuff for the LCD Screen
+extern void init();
+extern void initNokia();
+extern void clearDisplay();
+extern void drawBlock(unsigned char row, unsigned char col, unsigned char color);
+
+#define		TRUE			1
+#define		FALSE			0
+```
+
+Initialize the things I need for the LCD Screen and for the MSP430 IR Sensor:
+```
+	unsigned char x, y, button_press, color;
+
+	// === Initialize system ================================================
+	IFG1 = 0; /* clear interrupt flag1 */
+	WDTCTL = WDTPW + WDTHOLD; /* stop WD */
+	button_press = FALSE;
+	//above copied over from Lab 4 Required Functionality
+	color = TRUE;
+
+
+
+	initMSP430();				// Setup MSP to process IR and buttons
+
+	//copy over from lab 4 Required Functionality
+	init();
+	initNokia();
+	clearDisplay();
+	x = 4;
+	y = 4;
+	drawBlock( y, x, color);
+
+	_enable_interrupt();
+```
+
+After I get a newPacket and I'm going through what I want to do with message... After I get the message I need to talk to the LCD so I needed to init the things I need:
+```
+			init();
+			initNokia();
+```
+
+Then for each button press I needed to do the things that I need to do for the Etch-a-Sketch:
+```
+				if (bitString == CH_UP) {
+
+					if (y >= 1)
+						y = y - 1;
+					button_press = TRUE;
+				}
+				if (bitString == CH_DW) {
+
+					if (y <= 6)
+						y = y + 1;
+					button_press = TRUE;
+						}
+				if (bitString == ONE) {
+					if (color == TRUE) {
+						color = FALSE;
+					} else {
+						color = TRUE;
+					}
+						}
+				if (bitString == VOL_UP) {
+					if (x <= 10)
+						x = x + 1;
+					button_press = TRUE;
+						}
+				if (bitString == VOL_DW) {
+					if (x >= 1)
+						x = x - 1;
+					button_press = TRUE;
+						}
+				}
+				if (button_press) {
+					button_press = FALSE;
+					drawBlock(y, x, color);
+				}
+```
+
+Then I need to draw the block and re-initialize the MSP430 to continue talking to the MSP430 for recieve another data packet:
+```
+				drawBlock( y, x, color);
+				initMSP430();
+```
+
+That is all :) Thank you for reading.
+
 #Have a Great Air Force Day and Thanks for Reading!
 
 
